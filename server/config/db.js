@@ -6,9 +6,9 @@ dotenv.config();
 
 // MySQL connection pool
 export const mysqlPool = mysql.createPool({
-  host: process.env.MYSQL_HOST || 'localhost',
+  host: process.env.MYSQL_HOST || '127.0.0.1',
   user: process.env.MYSQL_USER || 'root',
-  password: process.env.MYSQL_PASSWORD || 'password',
+  password: process.env.MYSQL_PASSWORD !== undefined ? process.env.MYSQL_PASSWORD : '',
   database: process.env.MYSQL_DATABASE || 'ecommerce_db',
   waitForConnections: true,
   connectionLimit: 10,

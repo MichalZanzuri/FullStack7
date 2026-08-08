@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -10,6 +11,8 @@ import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
+
+import MyOrders from './pages/MyOrders';
 
 // Protected Route component for roles
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -42,6 +45,13 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
+          {/* Customer Orders Route */}
+          <Route path="/orders" element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          } />
+
           {/* Admin Protected Dashboard */}
           <Route path="/admin" element={
             <ProtectedRoute allowedRoles={['admin']}>
@@ -59,11 +69,13 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </CartProvider>
+      <CurrencyProvider>
+        <CartProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </CartProvider>
+      </CurrencyProvider>
     </AuthProvider>
   );
 }

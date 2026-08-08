@@ -12,7 +12,7 @@ const generateToken = (user) => {
 
 export const register = async (req, res, next) => {
   try {
-    const { email, password, role } = req.body;
+    const { name, email, password, role } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
@@ -24,12 +24,12 @@ export const register = async (req, res, next) => {
 
     const chosenRole = role === 'admin' ? 'admin' : 'customer';
 
-    const newUser = await User.create({ email, password, role: chosenRole });
+    const newUser = await User.create({ name, email, password, role: chosenRole });
     const token = generateToken(newUser);
 
     res.status(201).json({
       token,
-      user: { id: newUser.id, email: newUser.email, role: newUser.role }
+      user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role }
     });
   } catch (error) {
     next(error);
@@ -56,7 +56,24 @@ export const login = async (req, res, next) => {
     const token = generateToken(user);
     res.json({
       token,
-      user: { id: user.id, email: user.email, role: user.role }
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
     });
   } catch (error) {
     next(error);

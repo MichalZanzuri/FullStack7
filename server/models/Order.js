@@ -28,7 +28,7 @@ export const Order = {
     const [rows] = await mysqlPool.query('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC', [userId]);
     return rows.map(row => ({
       ...row,
-      items: JSON.parse(row.items)
+      items: typeof row.items === 'string' ? JSON.parse(row.items) : row.items
     }));
   },
 
@@ -41,7 +41,7 @@ export const Order = {
     `);
     return rows.map(row => ({
       ...row,
-      items: JSON.parse(row.items)
+      items: typeof row.items === 'string' ? JSON.parse(row.items) : row.items
     }));
   },
 

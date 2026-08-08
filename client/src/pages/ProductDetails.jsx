@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +47,7 @@ export default function ProductDetails() {
 
   const calculateTotalPrice = () => {
     if (!product) return 0;
-    const optionCost = Object.values(selectedOptions).reduce((acc, curr) => acc + curr.priceModifier, 0);
+    const optionCost = Object.values(selectedOptions).reduce((acc, curr) => acc + (curr?.priceModifier || 0), 0);
     return product.price + optionCost;
   };
 
@@ -65,7 +67,7 @@ export default function ProductDetails() {
         {/* Product Image */}
         <div className="glass-card" style={{ padding: '1rem', borderRadius: 'var(--radius-lg)' }}>
           <img
-            src={product.image}
+            src={product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80'}
             alt={product.name}
             style={{ width: '100%', borderRadius: 'var(--radius-md)', display: 'block', objectFit: 'cover' }}
           />
@@ -85,7 +87,7 @@ export default function ProductDetails() {
           <div style={{ borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', padding: '1.5rem 0' }}>
             <h3 style={{ fontSize: '1rem', marginBottom: '1.5rem' }}>Configure Options</h3>
             {product.customizationOptions?.map(opt => (
-              <div key={opt._id} style={{ marginBottom: '1.5rem' }}>
+              <div key={opt._id || opt.name} style={{ marginBottom: '1.5rem' }}>
                 <span className="form-label" style={{ fontWeight: 600 }}>{opt.name}</span>
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                   {opt.choices.map(choice => {
@@ -110,7 +112,7 @@ export default function ProductDetails() {
                       >
                         <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{choice.label}</span>
                         <span style={{ fontSize: '0.75rem', color: isSelected ? 'var(--accent-cyan)' : 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                          {choice.priceModifier === 0 ? 'Included' : `+$${choice.priceModifier}`}
+                          {choice.priceModifier === 0 ? 'Included' : `+${formatPrice(choice.priceModifier)}`}
                         </span>
                       </button>
                     );
@@ -125,7 +127,7 @@ export default function ProductDetails() {
             <div>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block' }}>Configured Price</span>
               <span style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-gold)' }}>
-                ${calculateTotalPrice().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                {formatPrice(calculateTotalPrice())}
               </span>
             </div>
             <button onClick={handleAddToCart} className="btn btn-primary" style={{ padding: '1rem 2rem' }}>

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function AdminDashboard() {
   const { token } = useAuth();
+  const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Form for new product
   const [newProduct, setNewProduct] = useState({
@@ -90,6 +93,38 @@ export default function AdminDashboard() {
     }
   };
 
+  // Multer File Upload Handler
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setUploadingImage(true);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Image upload failed');
+      }
+
+      const data = await res.json();
+      setNewProduct(prev => ({ ...prev, image: data.imageUrl }));
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const addCustomizationOption = () => {
     if (!optName || !choicesRaw) return;
     const choices = choicesRaw.split(',').map(choiceStr => {
@@ -106,6 +141,13 @@ export default function AdminDashboard() {
     }));
     setOptName('');
     setChoicesRaw('');
+  };
+
+  const removeCustomizationOption = (index) => {
+    setNewProduct(prev => ({
+      ...prev,
+      customizationOptions: prev.customizationOptions.filter((_, i) => i !== index)
+    }));
   };
 
   const handleCreateProduct = async (e) => {
@@ -166,7 +208,8 @@ export default function AdminDashboard() {
                       background: order.status === 'Pending' ? '#d97706' : order.status === 'Processing' ? '#2563eb' : '#16a34a',
                       color: '#fff',
                       padding: '2px 8px',
-                      borderRadius: '4px'
+                      borderRadius: '4px',
+                      fontWeight: 600
                     }}>{order.status}</span>
                   </div>
 
@@ -177,7 +220,7 @@ export default function AdminDashboard() {
                   <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.5rem', marginBottom: '0.5rem' }}>
                     {order.items.map((item, idx) => (
                       <div key={idx} style={{ fontSize: '0.8rem', marginBottom: '0.25rem' }}>
-                        {item.quantity}x {item.name} - ${(item.price).toLocaleString()}
+                        {item.quantity}x {item.name} - {formatPrice(item.price)}
                         <div style={{ color: 'var(--accent-cyan)', fontSize: '0.7rem', paddingLeft: '0.5rem' }}>
                           {Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(' | ')}
                         </div>
@@ -186,7 +229,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>Total: ${order.total_price}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>Total: {formatPrice(order.total_price)}</span>
                     {order.status !== 'Delivered' && (
                       <button onClick={() => handleUpdateStatus(order.id, order.status)} className="btn btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem' }}>
                         Advance Status
@@ -207,47 +250,76 @@ export default function AdminDashboard() {
             <h3 style={{ fontSize: '1.1rem', marginBottom: '1.25rem' }}>New Customizable Product (MongoDB)</h3>
             <form onSubmit={handleCreateProduct}>
               <div className="form-group">
-                <label className="form-label">Name</label>
-                <input type="text" className="form-input" value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} required />
+                <label className="form-label">Product Name</label>
+                <input type="text" className="form-input" value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} required placeholder="e.g. Apex Hyper-Scooter Pro" />
               </div>
               <div className="form-group">
                 <label className="form-label">Description</label>
-                <textarea className="form-input" rows="2" value={newProduct.description} onChange={(e) => setNewProduct({...newProduct, description: e.target.value})} required />
+                <textarea className="form-input" rows="2" value={newProduct.description} onChange={(e) => setNewProduct({...newProduct, description: e.target.value})} required placeholder="High performance specs..." />
               </div>
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Base Price ($)</label>
-                  <input type="number" className="form-input" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} required />
+                  <label className="form-label">Base Price (USD $)</label>
+                  <input type="number" step="any" className="form-input" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} required placeholder="299" />
                 </div>
                 <div className="form-group" style={{ flex: 1 }}>
                   <label className="form-label">Category</label>
-                  <input type="text" className="form-input" value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value})} required placeholder="Scooters / Car Parts" />
+                  <input type="text" className="form-input" value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value})} required placeholder="Scooters / Tech" />
                 </div>
               </div>
+
+              {/* Image Input with Multer File Upload and Preview */}
               <div className="form-group">
-                <label className="form-label">Image URL</label>
-                <input type="text" className="form-input" value={newProduct.image} onChange={(e) => setNewProduct({...newProduct, image: e.target.value})} required />
+                <label className="form-label">Product Image (Upload File or Enter URL)</label>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="https://... or /uploads/..."
+                    value={newProduct.image}
+                    onChange={(e) => setNewProduct({...newProduct, image: e.target.value})}
+                    style={{ flex: 1 }}
+                  />
+                  <label className="btn btn-secondary" style={{ padding: '0.5rem 0.8rem', fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    {uploadingImage ? 'Uploading...' : '📁 Upload File'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      style={{ display: 'none' }}
+                      disabled={uploadingImage}
+                    />
+                  </label>
+                </div>
+                {newProduct.image && (
+                  <div style={{ marginTop: '0.5rem', width: '100px', height: '60px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                    <img src={newProduct.image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                )}
               </div>
 
               {/* Dynamic options selector creation */}
-              <div style={{ border: '1px solid var(--border-color)', padding: '1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', background: 'rgba(0,0,0,0.1)' }}>
-                <h4 style={{ fontSize: '0.8rem', marginBottom: '0.75rem', color: 'var(--text-secondary)' }}>Add Customization Option</h4>
+              <div style={{ border: '1px solid var(--border-color)', padding: '1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', background: 'rgba(0,0,0,0.15)' }}>
+                <h4 style={{ fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--accent-cyan)' }}>Configure Customization Specs</h4>
                 <div className="form-group">
-                  <input type="text" className="form-input" placeholder="Option Name (e.g. Color)" value={optName} onChange={(e) => setOptName(e.target.value)} />
+                  <input type="text" className="form-input" placeholder="Option Name (e.g. Battery Capacity)" value={optName} onChange={(e) => setOptName(e.target.value)} />
                 </div>
                 <div className="form-group">
-                  <input type="text" className="form-input" placeholder="Choices (e.g. Red:0, Carbon:150)" value={choicesRaw} onChange={(e) => setChoicesRaw(e.target.value)} />
+                  <input type="text" className="form-input" placeholder="Choices (e.g. Standard 500Wh:0, Extended 1000Wh:120)" value={choicesRaw} onChange={(e) => setChoicesRaw(e.target.value)} />
                 </div>
                 <button type="button" onClick={addCustomizationOption} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', width: '100%' }}>
-                  Add Option Spec
+                  + Add Customization Spec
                 </button>
 
                 {newProduct.customizationOptions.length > 0 && (
-                  <div style={{ marginTop: '1rem' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Added Specs:</div>
+                  <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Configured Specs:</div>
                     {newProduct.customizationOptions.map((opt, i) => (
-                      <div key={i} style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>
-                        {opt.name}: {opt.choices.map(c => `${c.label}(+$${c.priceModifier})`).join(', ')}
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.03)', padding: '0.4rem 0.6rem', borderRadius: '4px' }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>
+                          <strong>{opt.name}:</strong> {opt.choices.map(c => `${c.label} (+${formatPrice(c.priceModifier)})`).join(', ')}
+                        </div>
+                        <button type="button" onClick={() => removeCustomizationOption(i)} style={{ background: 'none', border: 'none', color: 'var(--accent-red)', cursor: 'pointer', fontSize: '0.8rem' }}>✕</button>
                       </div>
                     ))}
                   </div>
@@ -262,16 +334,20 @@ export default function AdminDashboard() {
 
           {/* Product templates list */}
           <div>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>Product Templates</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>Active Product Templates ({products.length})</h3>
             {productsLoading ? (
               <p>Fetching templates...</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {products.map(prod => (
                   <div key={prod._id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
-                    <div>
-                      <h4 style={{ fontSize: '0.85rem' }}>{prod.name}</h4>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Base: ${prod.price}</span>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <img src={prod.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80'} alt={prod.name} style={{ width: '45px', height: '45px', objectFit: 'cover', borderRadius: '4px' }} />
+                      <div>
+                        <h4 style={{ fontSize: '0.85rem', marginBottom: '0.2rem' }}>{prod.name}</h4>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Base: {formatPrice(prod.price)}</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>• {prod.customizationOptions?.length || 0} specs</span>
+                      </div>
                     </div>
                     <button onClick={() => handleDeleteProduct(prod._id)} className="btn btn-danger" style={{ padding: '0.3rem 0.6rem', fontSize: '0.7rem' }}>
                       Delete

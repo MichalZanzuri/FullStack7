@@ -183,3 +183,16 @@ h1, h2, h3, h4, h5, h6 {
   .grid-3 { grid-template-columns: repeat(3, 1fr); }
   .grid-4 { grid-template-columns: repeat(4, 1fr); }
 }
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-toggle {
+    display: block !important;
+  }
+  .container {
+    padding: 0 1rem;
+  }
+}
+

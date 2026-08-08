@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function ProductCard({ product }) {
+  const { formatPrice } = useCurrency();
+
   return (
     <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{
@@ -13,7 +16,7 @@ export default function ProductCard({ product }) {
         background: '#18181b'
       }}>
         <img
-          src={product.image}
+          src={product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80'}
           alt={product.name}
           style={{
             position: 'absolute',
@@ -66,7 +69,7 @@ export default function ProductCard({ product }) {
               Starting at
             </span>
             <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>
-              ${product.price.toLocaleString()}
+              {formatPrice(product.price)}
             </span>
           </div>
 

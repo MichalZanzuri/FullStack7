@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function Cart() {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
   const { user, token } = useAuth();
+  const { formatPrice } = useCurrency();
   const navigate = useNavigate();
 
   const [checkoutStatus, setCheckoutStatus] = useState('');
@@ -63,7 +65,7 @@ export default function Cart() {
           <span style={{ fontSize: '4rem' }}>🎉</span>
           <h2 style={{ margin: '1.5rem 0', color: 'var(--accent-cyan)' }}>Order Confirmed!</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-            Your custom configuration order has been securely saved in our system. Our engineering team is reviewing your specification sheet.
+            Your custom configuration order has been securely saved in our MySQL database. Our engineering team is reviewing your specification sheet.
           </p>
           <Link to="/" className="btn btn-primary">Back to Catalog</Link>
         </div>
@@ -88,7 +90,7 @@ export default function Cart() {
             {cart.map(item => (
               <div key={item.cartItemId} className="glass-card" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                 <img
-                  src={item.product.image}
+                  src={item.product.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80'}
                   alt={item.product.name}
                   style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: 'var(--radius-sm)' }}
                 />
@@ -129,7 +131,7 @@ export default function Cart() {
 
                 <div style={{ textAlign: 'right', minWidth: '100px' }}>
                   <span style={{ fontSize: '1.1rem', fontWeight: 700 }}>
-                    ${(item.itemPrice * item.quantity).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {formatPrice(item.itemPrice * item.quantity)}
                   </span>
                 </div>
               </div>
@@ -143,14 +145,14 @@ export default function Cart() {
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
               <span style={{ color: 'var(--text-secondary)' }}>Subtotal</span>
               <span style={{ fontWeight: 600 }}>
-                ${getCartTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                {formatPrice(getCartTotal())}
               </span>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 700 }}>
               <span>Total</span>
               <span style={{ color: 'var(--accent-gold)' }}>
-                ${getCartTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                {formatPrice(getCartTotal())}
               </span>
             </div>
 
