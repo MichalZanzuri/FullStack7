@@ -9,7 +9,6 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('customer');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +18,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await register(name, email, password, role);
+      await register(name, email, password);
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -72,18 +71,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Account Role (For Demo/Testing)</label>
-            <select
-              className="form-input"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              style={{ background: 'var(--bg-tertiary)' }}
-            >
-              <option value="customer">Customer</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
+
 
           <button
             type="submit"

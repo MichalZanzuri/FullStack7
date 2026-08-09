@@ -22,7 +22,9 @@ export const register = async (req, res, next) => {
       return res.status(400).json({ message: 'Email already registered' });
     }
 
-    const chosenRole = role === 'admin' ? 'admin' : 'customer';
+    // Security Fix: Hardcode role to 'customer'. 
+    // Do not allow users to pass 'admin' in the request body to escalate privileges.
+    const chosenRole = 'customer';
 
     const newUser = await User.create({ name, email, password, role: chosenRole });
     const token = generateToken(newUser);
