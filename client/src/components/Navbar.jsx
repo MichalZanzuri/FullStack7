@@ -6,13 +6,14 @@ import { useCurrency } from '../context/CurrencyContext';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { cart } = useCart();
+  const { cart, clearCart } = useCart();
   const { currency, setCurrency, availableCurrencies, symbols } = useCurrency();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    clearCart();
     navigate('/');
     setMobileMenuOpen(false);
   };
