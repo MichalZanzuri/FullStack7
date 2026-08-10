@@ -36,9 +36,9 @@ export default function Checkout() {
     return (
       <div className="container" style={{ padding: '4rem 1.5rem', textAlign: 'center' }}>
         <div className="glass-card" style={{ maxWidth: '500px', margin: '0 auto' }}>
-          <h2 style={{ color: 'var(--accent-cyan)', marginBottom: '1.5rem' }}>סל הקניות ריק</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>לא ניתן לבצע תשלום ללא מוצרים בסל.</p>
-          <Link to="/" className="btn btn-primary">חזרה לקטלוג</Link>
+          <h2 style={{ color: 'var(--accent-cyan)', marginBottom: '1.5rem' }}>Shopping Cart is Empty</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Cannot checkout without any items in the cart.</p>
+          <Link to="/" className="btn btn-primary">Back to Catalog</Link>
         </div>
       </div>
     );
@@ -85,11 +85,11 @@ export default function Checkout() {
 
     // Basic Validation
     if (!shipping.fullName || !shipping.phone || !shipping.address || !shipping.city) {
-      setError('אנא מלאו את כל שדות המשלוח הנדרשים.');
+      setError('Please fill all required shipping fields.');
       return;
     }
     if (!payment.cardholderName || payment.cardNumber.replace(/\s/g, '').length !== 16 || payment.expiry.length !== 5 || payment.cvv.length !== 3) {
-      setError('אנא ודאו שכל פרטי כרטיס האשראי תקינים ומלאים.');
+      setError('Please ensure all credit card details are valid and complete.');
       return;
     }
 
@@ -97,10 +97,10 @@ export default function Checkout() {
     
     // Simulate Premium Payment Processing Steps
     const stepsList = [
-      'מבצע אימות פרטי אשראי...',
-      'יוצר קשר מאובטח עם שרת הסליקה...',
-      'מאשר עסקה מול חברת האשראי...',
-      'שומר את ההזמנה שלך במערכת...'
+      'Verifying credit card details...',
+      'Establishing secure connection to gateway...',
+      'Authorizing transaction with card issuer...',
+      'Saving your order in our database...'
     ];
 
     for (let i = 0; i < stepsList.length; i++) {
@@ -135,40 +135,40 @@ export default function Checkout() {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.message || 'יצירת ההזמנה נכשלה בשרת.');
+        throw new Error(data.message || 'Failed to create order on server.');
       }
 
       setIsSuccess(true);
       clearCart();
     } catch (err) {
-      setError(err.message || 'קרתה שגיאה במהלך ביצוע ההזמנה. אנא נסו שוב.');
+      setError(err.message || 'An error occurred during order submission. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const stepsList = [
-    'מבצע אימות פרטי אשראי...',
-    'יוצר קשר מאובטח עם שרת הסליקה...',
-    'מאשר עסקה מול חברת האשראי...',
-    'שומר את ההזמנה שלך במערכת...'
+    'Verifying credit card details...',
+    'Establishing secure connection to gateway...',
+    'Authorizing transaction with card issuer...',
+    'Saving your order in our database...'
   ];
 
   if (isSuccess) {
     return (
-      <div className="container" style={{ textAlign: 'center', padding: '4rem 1.5rem', direction: 'rtl' }}>
+      <div className="container" style={{ textAlign: 'center', padding: '4rem 1.5rem' }}>
         <div className="glass-card" style={{ maxWidth: '600px', margin: '0 auto', border: '1px solid var(--accent-cyan)' }}>
           <span style={{ fontSize: '5rem', display: 'block', marginBottom: '1rem' }}>🎉</span>
-          <h2 style={{ margin: '1.5rem 0', color: 'var(--accent-cyan)', fontSize: '2rem' }}>התשלום בוצע בהצלחה!</h2>
+          <h2 style={{ margin: '1.5rem 0', color: 'var(--accent-cyan)', fontSize: '2rem' }}>Payment Completed Successfully!</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '1.1rem' }}>
-            ההזמנה שלך התקבלה בהצלחה ואושרה במערכת.
+            Your order has been successfully placed and saved in the system.
           </p>
           <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem' }}>
-            צוות המהנדסים והתמיכה שלנו כבר מתחיל לעבוד על המפרט האישי שלך.
+            Our engineering and support team has started reviewing your custom specification.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            <Link to="/orders" className="btn btn-primary">ההזמנות שלי</Link>
-            <Link to="/" className="btn btn-secondary">חזרה לקטלוג</Link>
+            <Link to="/orders" className="btn btn-primary">My Orders</Link>
+            <Link to="/" className="btn btn-secondary">Back to Catalog</Link>
           </div>
         </div>
       </div>
@@ -176,9 +176,9 @@ export default function Checkout() {
   }
 
   return (
-    <div className="container" style={{ marginBottom: '4rem', direction: 'rtl' }}>
-      <h2 style={{ fontSize: '1.8rem', marginBottom: '2rem', textAlign: 'right', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <span style={{ color: 'var(--accent-cyan)' }}>🛒</span> קופה ותשלום מאובטח
+    <div className="container" style={{ marginBottom: '4rem' }}>
+      <h2 style={{ fontSize: '1.8rem', marginBottom: '2rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <span style={{ color: 'var(--accent-cyan)' }}>🛒</span> Secure Checkout & Payment
       </h2>
 
       {loading ? (
@@ -192,7 +192,7 @@ export default function Checkout() {
             animation: 'spin 1s linear infinite',
             margin: '0 auto 2rem'
           }} />
-          <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>מעבד תשלום מאובטח</h3>
+          <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Processing Secure Payment</h3>
           <p style={{ color: 'var(--accent-cyan)', fontSize: '1.1rem', fontWeight: 600, minHeight: '1.5rem' }}>
             {stepsList[processingStep]}
           </p>
@@ -222,11 +222,11 @@ export default function Checkout() {
             {/* Shipping section */}
             <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <h3 style={{ fontSize: '1.1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', color: 'var(--accent-cyan)' }}>
-                🚚 פרטי משלוח ויצירת קשר
+                🚚 Shipping & Contact Details
               </h3>
               
               <div className="form-group">
-                <label className="form-label">שם מלא</label>
+                <label className="form-label">Full Name</label>
                 <input
                   type="text"
                   name="fullName"
@@ -234,13 +234,13 @@ export default function Checkout() {
                   onChange={(e) => handleInputChange(e, 'shipping')}
                   className="form-input"
                   required
-                  placeholder="ישראל ישראלי"
+                  placeholder="John Doe"
                 />
               </div>
 
               <div className="grid grid-2" style={{ gap: '1rem' }}>
                 <div className="form-group">
-                  <label className="form-label">טלפון</label>
+                  <label className="form-label">Phone Number</label>
                   <input
                     type="tel"
                     name="phone"
@@ -252,7 +252,7 @@ export default function Checkout() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">עיר</label>
+                  <label className="form-label">City</label>
                   <input
                     type="text"
                     name="city"
@@ -260,14 +260,14 @@ export default function Checkout() {
                     onChange={(e) => handleInputChange(e, 'shipping')}
                     className="form-input"
                     required
-                    placeholder="תל אביב"
+                    placeholder="New York"
                   />
                 </div>
               </div>
 
               <div className="grid grid-2" style={{ gap: '1rem' }}>
                 <div className="form-group">
-                  <label className="form-label">כתובת למשלוח (רחוב ומספר בית)</label>
+                  <label className="form-label">Shipping Address (Street & House No.)</label>
                   <input
                     type="text"
                     name="address"
@@ -275,18 +275,18 @@ export default function Checkout() {
                     onChange={(e) => handleInputChange(e, 'shipping')}
                     className="form-input"
                     required
-                    placeholder="רחוב הרצל 100"
+                    placeholder="100 Broadway St"
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">מיקוד (אופציונלי)</label>
+                  <label className="form-label">ZIP Code (Optional)</label>
                   <input
                     type="text"
                     name="zip"
                     value={shipping.zip}
                     onChange={(e) => handleInputChange(e, 'shipping')}
                     className="form-input"
-                    placeholder="61000"
+                    placeholder="10001"
                   />
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function Checkout() {
             {/* Payment Section */}
             <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', position: 'relative', overflow: 'hidden' }}>
               <h3 style={{ fontSize: '1.1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', color: 'var(--accent-cyan)' }}>
-                💳 פרטי כרטיס אשראי
+                💳 Credit Card Details
               </h3>
 
               {/* Styled Interactive Card Graphic */}
@@ -327,18 +327,18 @@ export default function Checkout() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
-                    <span style={{ display: 'block', fontSize: '0.6rem', opacity: 0.6 }}>שם בעל הכרטיס</span>
+                    <span style={{ display: 'block', fontSize: '0.6rem', opacity: 0.6 }}>CARDHOLDER NAME</span>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{payment.cardholderName.toUpperCase() || 'CARDHOLDER NAME'}</span>
                   </div>
                   <div>
-                    <span style={{ display: 'block', fontSize: '0.6rem', opacity: 0.6 }}>תוקף</span>
+                    <span style={{ display: 'block', fontSize: '0.6rem', opacity: 0.6 }}>EXPIRY</span>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{payment.expiry || 'MM/YY'}</span>
                   </div>
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="form-label">שם בעל הכרטיס (באנגלית)</label>
+                <label className="form-label">Cardholder Name</label>
                 <input
                   type="text"
                   name="cardholderName"
@@ -346,13 +346,13 @@ export default function Checkout() {
                   onChange={(e) => handleInputChange(e, 'payment')}
                   className="form-input"
                   required
-                  placeholder="ISRAEL ISRAELI"
+                  placeholder="JOHN DOE"
                   style={{ textTransform: 'uppercase' }}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">מספר כרטיס</label>
+                <label className="form-label">Card Number</label>
                 <input
                   type="text"
                   name="cardNumber"
@@ -366,7 +366,7 @@ export default function Checkout() {
 
               <div className="grid grid-2" style={{ gap: '1rem' }}>
                 <div className="form-group">
-                  <label className="form-label">תוקף (חודש/שנה)</label>
+                  <label className="form-label">Expiry Date (MM/YY)</label>
                   <input
                     type="text"
                     name="expiry"
@@ -378,7 +378,7 @@ export default function Checkout() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">CVV (3 ספרות בגב הכרטיס)</label>
+                  <label className="form-label">CVV (3 Digits)</label>
                   <input
                     type="text"
                     name="cvv"
@@ -396,7 +396,7 @@ export default function Checkout() {
 
           {/* Checkout Summary panel */}
           <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.1rem', color: 'var(--accent-cyan)' }}>סיכום הזמנה</h3>
+            <h3 style={{ fontSize: '1.1rem', color: 'var(--accent-cyan)' }}>Order Summary</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '200px', overflowY: 'auto', paddingLeft: '5px' }}>
               {cart.map(item => (
@@ -411,17 +411,17 @@ export default function Checkout() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>סכום ביניים</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Subtotal</span>
               <span>{formatPrice(getCartTotal())}</span>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 700, borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-              <span>סה"כ לתשלום</span>
+              <span>Total Price</span>
               <span style={{ color: 'var(--accent-gold)' }}>{formatPrice(getCartTotal())}</span>
             </div>
 
             {error && (
-              <div style={{ color: 'var(--accent-red)', fontSize: '0.85rem', textAlign: 'right' }}>⚠️ {error}</div>
+              <div style={{ color: 'var(--accent-red)', fontSize: '0.85rem', textAlign: 'left' }}>⚠️ {error}</div>
             )}
 
             <button
@@ -429,11 +429,11 @@ export default function Checkout() {
               className="btn btn-primary"
               style={{ width: '100%', padding: '1rem', marginTop: '0.5rem' }}
             >
-              בצע תשלום מאובטח
+              Place Secure Order
             </button>
             
             <Link to="/cart" style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)', textDecoration: 'underline' }}>
-              חזרה לעריכת הסל
+              Back to edit cart
             </Link>
           </div>
 

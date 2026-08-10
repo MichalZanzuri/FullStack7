@@ -128,7 +128,7 @@ export default function Cart() {
               className="btn btn-primary"
               style={{ width: '100%', padding: '1rem' }}
             >
-              {user ? 'המשך לתשלום 💳' : 'Login to Checkout'}
+              {user ? 'Proceed to Checkout 💳' : 'Login to Checkout'}
             </button>
           </div>
 
