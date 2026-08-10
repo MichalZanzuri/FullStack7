@@ -1,6 +1,6 @@
-# ⚡ Veloce Custom - Premium Customizable E-Commerce Platform
+# ⚡ CostumTech - Premium Customizable E-Commerce Platform
 
-Welcome to **Veloce Custom**, a state-of-the-art full-stack web application designed for configuration and purchase of premium custom-built tech gear and mechanical products (such as high-fidelity audio headphones, mechanical keyboards, luxury smartwatches, and commuter bags).
+Welcome to **CostumTech**, a state-of-the-art full-stack web application designed for configuration and purchase of premium custom-built tech gear and mechanical products (such as high-fidelity audio headphones, mechanical keyboards, luxury smartwatches, and commuter bags).
 
 The application features a sleek, high-end dark-themed UI built using modern design principles (Glassmorphism, custom glowing accents, interactive animations, and responsive structures).
 

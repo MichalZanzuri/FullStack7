@@ -314,7 +314,7 @@ export default function Checkout() {
                 border: '1px solid rgba(255,255,255,0.1)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8rem', letterSpacing: '0.1rem', opacity: 0.8, fontFamily: 'var(--font-display)' }}>VELOCE PREMIUM CARD</span>
+                  <span style={{ fontSize: '0.8rem', letterSpacing: '0.1rem', opacity: 0.8, fontFamily: 'var(--font-display)' }}>COSTUMTECH PREMIUM CARD</span>
                   <svg width="40" height="25" viewBox="0 0 50 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="15" cy="15" r="15" fill="#EB001B" fillOpacity="0.8"/>
                     <circle cx="35" cy="15" r="15" fill="#F79E1B" fillOpacity="0.8"/>

@@ -38,7 +38,7 @@ export default function Navbar() {
         <Link to="/" onClick={() => setMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ fontSize: '1.5rem' }}>⚡</span>
           <h1 style={{ fontSize: '1.25rem', margin: 0, letterSpacing: '0.1em' }} className="gradient-text">
-            CustomTech
+            CostumTech
           </h1>
         </Link>
 
