@@ -11,8 +11,8 @@ import Cart from './pages/Cart';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
-
 import MyOrders from './pages/MyOrders';
+import Checkout from './pages/Checkout';
 
 // Protected Route component for roles
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -45,6 +45,13 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           
+          {/* Checkout Route */}
+          <Route path="/checkout" element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          } />
+
           {/* Customer Orders Route */}
           <Route path="/orders" element={
             <ProtectedRoute>

@@ -13,49 +13,12 @@ export default function Cart() {
   const [checkoutStatus, setCheckoutStatus] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!user) {
       navigate('/login?redirect=cart');
       return;
     }
-
-    try {
-      setLoading(true);
-      const orderItems = cart.map(item => ({
-        productId: item.product._id,
-        name: item.product.name,
-        price: item.itemPrice,
-        quantity: item.quantity,
-        selectedOptions: Object.entries(item.selectedOptions).reduce((acc, [optName, choice]) => {
-          acc[optName] = choice.label;
-          return acc;
-        }, {})
-      }));
-
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          items: orderItems,
-          totalPrice: getCartTotal()
-        })
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || 'Checkout failed');
-      }
-
-      setCheckoutStatus('success');
-      clearCart();
-    } catch (err) {
-      setCheckoutStatus(err.message);
-    } finally {
-      setLoading(false);
-    }
+    navigate('/checkout');
   };
 
   if (checkoutStatus === 'success') {
@@ -162,11 +125,10 @@ export default function Cart() {
 
             <button
               onClick={handleCheckout}
-              disabled={loading}
               className="btn btn-primary"
               style={{ width: '100%', padding: '1rem' }}
             >
-              {loading ? 'Processing...' : user ? 'Submit Custom Order' : 'Login to Checkout'}
+              {user ? 'המשך לתשלום 💳' : 'Login to Checkout'}
             </button>
           </div>
 
